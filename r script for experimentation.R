@@ -23,8 +23,33 @@ mat <- matrix(data = NA, nrow = 476532, ncol = 413)
 colnames(mat) <- unique(D1$start_time_DI)
 users <- unique(D1$userid_DI)
 DF3 <- cbind(users, mat)
-DF3 <- as.data.frame(x)
-DF3[1:3, 1:3]
+DF3 <- as.data.frame(DF3)
+dim(DF3)
+x <- as.data.frame(DF3[,1:2])
+head(x)
+dim(x)[[1]]
+
+for(i in 1:dim(x)[[1]]){
+  date <- colnames(x)[2]
+  if(date == as.character(D1$start_time_DI) && x[i,1] == as.character(D1$userid_DI)) {
+    x[i,2] == 1}  
+}
+sum(x[,2])
+
+if(date != as.character(D1$start_time_DI) && x[1,1] != as.character(D1$userid_DI)) {x[1] == 1}
+  head(D1)
+
+length(date == as.character(D1$start_time_DI))
+length(x[1,1] == as.character(D1$userid_DI))
+
+y<- filter(D1, start_time_DI == "2012-12-19")
+
+       #take date and compare it to the column with registration dates in original data frame,
+#if there is a match return 1
+
+#with one column containing the student ids and all other cells indicating a
+#`1` if the student registered on that date or an `NA` if they did not  
+
 
 names(D1)
 spread(D1.1, key = userid_DI, value = start_time_DI)
