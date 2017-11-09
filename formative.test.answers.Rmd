@@ -1,0 +1,75 @@
+---
+title: "Formative Test 1 - Answers"
+author: "Charles Lang"
+date: "10/11/2017"
+output: html_document
+---
+Question 4
+```{r}
+D1 <- read.csv("~/Downloads/HMXPC13_DI_v2_5-14-14(1).csv", header = TRUE)
+
+```
+Question 5
+DI = de-identified
+
+Question 6
+```{r, warning=FALSE}
+library(dplyr)
+D1b <- filter(D1, course_id == "HarvardX/CS50x/2012", certified == 1)
+```
+Answer: 1287
+
+Question 7
+```{r}
+D1c <- filter(D1, course_id == "HarvardX/CS50x/2012", final_cc_cname_DI == "Columbia", start_time_DI == "2012-10-15")
+
+D1c <- filter(D1, course_id == "HarvardX/CS50x/2012", final_cc_cname_DI == "Colombia", start_time_DI == "2012-10-15")
+```
+Answer (Columbia): 0
+Answer (Colombia): 10
+
+Question 8
+```{r}
+D2 <- filter(D1, final_cc_cname_DI == "Other Oceania")
+D2 <- select(D2, userid_DI, start_time_DI)
+```
+
+Question 9
+```{r, warning=FALSE}
+library(tidyr)
+
+#Generate a count variable to fill the cells with
+D2$register <- 1
+#Depending on the country you choose there are duplicate entries for registration and ID (someone should probably tell EdX about that :/)
+D2 <- unique(D2)
+D3 <- spread(D2, start_time_DI, register)
+```
+
+Question 10
+```{r}
+row.names(D3) <- D3$userid_DI
+D3$userid_DI <- NULL
+```
+
+Question 11
+```{r}
+#Need to convert NA to 0 for matrix multiplication to work
+M1[is.na(M1)] <- 0
+M1 <- as.matrix(D3)
+```
+
+Question 12
+```{r}
+M2 <- t(M1)
+```
+
+Question 13
+```{r}
+M3 <- M1 %*% t(M1)
+```
+
+Question 13
+```{r}
+diag(M3) <- NA
+```
+
