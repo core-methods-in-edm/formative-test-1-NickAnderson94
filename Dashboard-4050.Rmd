@@ -1,0 +1,142 @@
+---
+title: "Untitled"
+author: "Nick Anderson"
+date: "October 17, 2017"
+output: flexdashboard::flex_dashboard
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message=FALSE, warning=FALSE)
+library(tidyverse)
+library(flexdashboard)
+library(ggplot2)
+library(DT)
+library(dplyr)
+D1 <- read.csv("formative1-results-DI.csv")
+
+```
+
+
+##Column 1 
+###Total Score Distribution
+
+```{r Total Score Distribution}
+D2 <- select(D1, Q1:Q14)
+D3 <- ifelse(D2 == "Yes", 1, 0)
+D3 <- as.data.frame(D3)
+names(D3) <- c(1:14)
+D3$total <- rowSums(D3)
+D4 <- D3[,15]
+D5 <- as.tibble(D4)
+
+#Plot total scores
+ggplot(D5, aes(D5)) +
+    geom_bar(color="#20B2AA", fill = "#40E0D0",width = 1) +
+    xlab("Total Score")+ ylab("Count") + 
+    ggtitle("Total Score Distribution") +
+    scale_x_continuous(breaks = scales::pretty_breaks(n = 14)) +
+    scale_y_continuous(breaks = scales::pretty_breaks(n = 3))  +
+    geom_vline(xintercept=9.93) 
+
+```
+
+###Stacked Bar Chart #GoEddie
+
+```{r Stacked Bar chart}
+D5 <- D1 %>% select(-pull.request,-attached.rmd) 
+# creaate another table according to 1
+
+dat <- read.csv(text = "question, response, N
+        Q1, YES, 29
+        Q2, YES, 28
+        Q2, NO, 1
+        Q3, YES, 29
+        Q4, YES, 29
+        Q5, YES, 17
+        Q5, NO, 9
+        Q5, Did not answer, 3
+        Q6, YES, 28
+        Q6, NO, 1
+        Q7, YES, 22
+        Q7, NO, 7
+        Q8, Did not answer, 2
+        Q8, YES, 27
+        Q9, Did not answer, 6
+        Q9, YES, 13
+        Q9, NO, 10
+        Q10, Did not answer, 10
+        Q10, YES, 9
+        Q10, NO, 10
+        Q11, Did not answer, 10
+        Q11, YES, 17
+        Q11, NO, 2
+        Q12, Did not answer, 10
+        Q12, YES, 17
+        Q12, NO, 2
+        Q13, Did not answer, 11
+        Q13, YES, 12
+        Q13, NO, 6
+        Q14, Did not answer, 13
+        Q14, YES, 14
+        Q14, NO, 2", strip.white = TRUE)
+
+
+
+tag <- c(1:14)
+#dat2$question <- as.character(dat2$question)
+names(tag) <- c("Q1","Q2","Q3","Q4","Q5","Q6","Q7","Q8","Q9","Q10","Q11","Q12","Q13","Q14")
+dat$question <- as.character(dat$question)
+dat2 <- data.frame(dat, order = tag[dat$question])
+
+g <- ggplot(dat2, aes(x = reorder(question, dat2$order), y = N, fill = response)) + geom_bar(stat = "identity") + labs(title = "Response for Q1-Q14 ", x = "question", y = "count")
+
+g
+```
+
+###Attempt Rate
+
+```{r Bar chart of percentage of correct responses per question}
+D7 <- dplyr::select(D1,starts_with("Q"))
+
+Q1<-length(which(D7$Q1 != "Did not answer")) 
+Q2<-length(which(D7$Q2 != "Did not answer")) 
+Q3<-length(which(D7$Q3 != "Did not answer")) 
+Q4<-length(which(D7$Q4 != "Did not answer")) 
+Q5<-length(which(D7$Q5 != "Did not answer")) 
+Q6<-length(which(D7$Q6 != "Did not answer")) 
+Q7<-length(which(D7$Q7 != "Did not answer")) 
+Q8<-length(which(D7$Q8 != "Did not answer")) 
+Q9<-length(which(D7$Q9 != "Did not answer")) 
+Q10<-length(which(D7$Q10 != "Did not answer")) 
+Q11<-length(which(D7$Q11 != "Did not answer")) 
+Q12<-length(which(D7$Q12 != "Did not answer")) 
+Q13<-length(which(D7$Q13 != "Did not answer")) 
+Q14<-length(which(D7$Q14 != "Did not answer")) 
+
+D8<- c(Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8,Q9, Q10, Q11, Q12, Q13,Q14)
+D8<-as.data.frame(D8)
+names(D8)<-c("num")
+D8$attempt_rate<-D8$num/29
+D8$questions<-c(1:14)
+
+D8_questions <- table(D8$questions)
+questions_levels <- names(D8_questions)[order(D8_questions)]
+D8$questions<- factor(D8$questions, levels =questions_levels)
+ggplot(D8, aes(x=D8$questions, y=D8$attempt_rate), group=1)+
+  geom_line()+
+   geom_point()+
+  labs(x = "Question", y = "Attempt Rate", 
+       title = "Attempt Rate")
+
+```
+
+## Column 2
+
+###Tabulated Class Data
+
+```{r Data table}
+D1 %>% 
+  select(pull.request, attached.rmd, Q1:Q14) %>%
+  DT::datatable()
+```
+
